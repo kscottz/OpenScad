@@ -1,6 +1,16 @@
 // http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalPrism
 //  http://kitwllace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalDipyramid
 // hexdipy needs the face thickness to be set to ( cage size / diameter ) * 2 to render correctly eg (5/50)*2 and then scaled to unit length. 
+
+// Current Set 
+//cageSz = 5;
+//diameter = 50;
+//height = 200;
+//count = 3;
+//solid_2 = openface(solid_1,outer_inset_ratio=0.3,inner_inset_ratio=0.2,depth=0.1,fn=[]);
+// 
+
+
 cageSz = 5;
 diameter = 50;
 height = 200;
@@ -79,11 +89,11 @@ module makeCage(width,height,cageSz)
             for (i=[0:60:360]){
                 rotate([0,0,i])
                 translate([width/2,0,0])
-                cube(size = [width/2,(width-cageSz)/2,height-(2*cageSz)-3],          center = true);
+                cube(size = [width/2,(width-cageSz)/2,height-(2*cageSz)],          center = true);
             }
         }
         
-    translate([0,0,(-height/2);])
+    translate([0,0,(-height/2)])
     makeBottomPyramid(diameter);
     }
 }

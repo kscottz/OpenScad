@@ -1,7 +1,7 @@
 // source=coordinates form=openface id =HexagonalDipyramid
 solid_1 = HexagonalDipyramid();
 p_describe(solid_1);
-solid_2 = openface(solid_1,outer_inset_ratio=0.2,inner_inset_ratio=0.2,depth=0.2,fn=[]);
+solid_2 = openface(solid_1,outer_inset_ratio=0.3,inner_inset_ratio=0.2,depth=0.1,fn=[]);
 scale(1) show_solid(solid_2);
 
 function Z() = HexagonalDipyramid();
