@@ -9,16 +9,67 @@
 //count = 3;
 //solid_2 = openface(solid_1,outer_inset_ratio=0.3,inner_inset_ratio=0.2,depth=0.1,fn=[]);
 // 
-
-
 cageSz = 5;
 diameter = 50;
 height = 200;
 count = 3;
+innerD = 0.75;
+outerD = 1.5;
+shrink = 0.03;
+bump = 1.002;
 
-makeCageWithBars(count,diameter,height,cageSz);
-translate([0,0,height/2+10])
-makeTopPyramid(diameter);
+
+union()
+{
+    makeCageWithBars(count,diameter,height,cageSz);
+    translate([(bump*(diameter+outerD)/2),0,height/2])
+    rotate([90,0,0])
+    makeDoubleClasp(innerD,outerD,(diameter/2),shrink);
+}
+
+rotate([0,10,0])
+translate([-18,0,15])
+union(){
+    translate([0,0,height/2])
+    makeTopPyramid(diameter);
+    translate([bump*((diameter+outerD)/2),0,height/2])
+    rotate([90,0,0])
+    makeSingleClasp(innerD,outerD,diameter/2,shrink);
+    translate([-1*bump*((diameter+outerD)/2),0,height/2])
+    rotate([90,0,0])
+    makeDoubleClasp(innerD,outerD,(diameter/2),shrink);
+
+}
+
+module makeSingleClasp(innerD,outerD,length,shrink)
+{
+    difference(){
+        final_length = (length/3)*(1-shrink);
+        cylinder(h = final_length, r1 = outerD, r2=outerD, center = true,$fn=72);
+        cylinder(h = final_length, r1 = innerD, r2=innerD, center = true,$fn=72);
+    }
+}
+
+module makeDoubleClasp(innerD,outerD,length,shrink)
+{
+    // derive diameter to side length
+//    a = d/2
+//    p = 6*a 
+//    p = 6*d/2
+//    p = 3*d
+//    s = p/6
+//    p = 6*s
+//    3*d = 6*s
+//    3*d/6 = s
+//    d/2 = s 
+    difference(){
+        difference(){
+            cylinder(h = length, r1 = outerD, r2=outerD, center = true,$fn=72);
+            cylinder(h = length, r1 = innerD, r2=innerD, center = true,$fn=72);
+        }
+        cube([length,length,length/3],center=true);
+    }
+}
 
 module makeTopPyramid(diameter)
 {
