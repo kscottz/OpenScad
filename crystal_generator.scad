@@ -4,19 +4,36 @@
 cageSz = 5;
 diameter = 50;
 height = 200;
-count = 5;
+count = 11;
 
 makeCageWithBars(count,diameter,height,cageSz);
+translate([0,0,height/2+10])
+makeTopPyramid(diameter);
 
-translate([0,0,height/2])
-scale([diameter/2,diameter/2,diameter/2])
-import("hexdipy.stl", convexity=3);
 
-translate([0,0,-height/2])
-scale([diameter/2,diameter/2,diameter/2])
-import("hexdipy.stl", convexity=3);
 
-    
+
+module makeTopPyramid(diameter)
+{
+    scale([diameter/2,diameter/2,diameter/2])
+    difference(){
+        import("hexdipy.stl", convexity=3);
+        translate([0,0,-1])
+        cube([3,3,2],center=true);
+    }
+}
+
+module makeBottomPyramid(diameter)
+{
+    scale([diameter/2,diameter/2,diameter/2])
+    difference(){
+        import("hexdipy.stl", convexity=3);
+        translate([0,0,+1])
+        cube([3,3,2],center=true);
+    }
+}
+
+
 module hex(cle)
 {
 	angle = 360/6;		// 6 pans
@@ -31,6 +48,7 @@ module hex(cle)
 			square([cle,cote],center=true);
 	}
 }   
+
 module makeCageWithBars(count,width,height,cageSz)
 {
     step = height/(count+1);
@@ -57,14 +75,18 @@ module makeBar(width,cageSz)
 
 module makeCage(width,height,cageSz)
 {
-    difference()
-    {
-        buildHexRod(width,height,cageSz);
-        for (i=[0:60:360]){
-            rotate([0,0,i])
-            translate([width/2,0,0])
-            cube(size = [width/2,(width-cageSz)/2,height-(2*cageSz)], center = true);
+    union(){
+        difference()
+        {
+            buildHexRod(width,height,cageSz);
+            for (i=[0:60:360]){
+                rotate([0,0,i])
+                translate([width/2,0,0])
+                cube(size = [width/2,(width-cageSz)/2,height-(2*cageSz)],          center = true);
+            }
         }
+    translate([0,0,-height/2])
+    makeBottomPyramid(diameter);
     }
 }
 
