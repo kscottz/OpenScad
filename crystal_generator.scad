@@ -1,17 +1,14 @@
 // http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalPrism
-//  http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalDipyramid
-// hexdipy needs to ( cage size / diameter face depth ) * 2 
+//  http://kitwllace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalDipyramid
+// hexdipy needs the face thickness to be set to ( cage size / diameter ) * 2 to render correctly eg (5/50)*2 and then scaled to unit length. 
 cageSz = 5;
 diameter = 50;
 height = 200;
-count = 11;
+count = 3;
 
 makeCageWithBars(count,diameter,height,cageSz);
 translate([0,0,height/2+10])
 makeTopPyramid(diameter);
-
-
-
 
 module makeTopPyramid(diameter)
 {
@@ -54,7 +51,7 @@ module makeCageWithBars(count,width,height,cageSz)
     step = height/(count+1);
     union(){
         makeCage(width,height,cageSz);
-        for(i=[-height/2:step:height/2]){
+        for(i=[-(height/2)+step:step:(height/2)-step]){
             echo(i);
             translate([0,0,i])
             makeBar(width,cageSz);
@@ -68,7 +65,7 @@ module makeBar(width,cageSz)
         for (i=[0:60:360]){
             rotate([0,0,i])
             translate([width/2-cageSz/4,,0])
-            cube(size = [cageSz/2,width/2,cageSz/2], center = true);
+            cube(size = [cageSz/2,width/2,(cageSz/2)], center = true);
         }
     }
 }
@@ -82,10 +79,11 @@ module makeCage(width,height,cageSz)
             for (i=[0:60:360]){
                 rotate([0,0,i])
                 translate([width/2,0,0])
-                cube(size = [width/2,(width-cageSz)/2,height-(2*cageSz)],          center = true);
+                cube(size = [width/2,(width-cageSz)/2,height-(2*cageSz)-3],          center = true);
             }
         }
-    translate([0,0,-height/2])
+        
+    translate([0,0,(-height/2);])
     makeBottomPyramid(diameter);
     }
 }
