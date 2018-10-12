@@ -1,5 +1,22 @@
-makeCageWithBars(2,50,200,5);
+// http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalPrism
+//  http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalDipyramid
+// hexdipy needs to ( cage size / diameter face depth ) * 2 
+cageSz = 5;
+diameter = 50;
+height = 200;
+count = 5;
 
+makeCageWithBars(count,diameter,height,cageSz);
+
+translate([0,0,height/2])
+scale([diameter/2,diameter/2,diameter/2])
+import("hexdipy.stl", convexity=3);
+
+translate([0,0,-height/2])
+scale([diameter/2,diameter/2,diameter/2])
+import("hexdipy.stl", convexity=3);
+
+    
 module hex(cle)
 {
 	angle = 360/6;		// 6 pans
