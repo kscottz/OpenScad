@@ -1,4 +1,4 @@
-// http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalPrism
+    // http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalPrism
 //  http://kitwllace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalDipyramid
 // hexdipy needs the face thickness to be set to ( cage size / diameter ) * 2 to render correctly eg (5/50)*2 and then scaled to unit length. 
 
@@ -23,21 +23,26 @@ bale_id = 2;
 bale_od = 4;
 bale_w = 2;
 
+pin_w = 1;
+pin_h = 0.5;
+pin_d = 3;
 $fn = 24;
-
-
-//bale(bale_id,bale_od,bale_w);
-
 
 union()
 {
-    makeCageWithBars(count,diameter,height,cageSz);
+    difference(){
+        makeCageWithBars(count,diameter,height,cageSz);
+        sf = 1.05;
+        translate([(-diameter/2),0,(height/2)])
+        makePin(pin_w+10,pin_h*1.7,pin_d*1.7);
+    }
+
     translate([(bump*(diameter+outerD)/2),0,height/2])
     rotate([90,0,0])
     makeDoubleClasp(innerD,outerD,(diameter/2),shrink);
 }
-//rotate([0,10,0])
-translate([0,0,1])
+rotate([0,10,0])
+translate([-19,0,10])
 union(){
     translate([0,0,height/2])
     makeTopPyramid(diameter);
@@ -54,10 +59,27 @@ union(){
     rotate([90,0,0])
     bale(bale_id,bale_od,bale_w);
 
+    translate([(-diameter/2),0,(height/2)-0.8])
+    makePin(pin_w,pin_h,pin_d);
+    
+    // Part of a wire press latch
 //    translate([-1*bump*((diameter+outerD)/2),0,height/2])
 //    rotate([90,0,0])
 //    makeDoubleClasp(innerD,outerD,(diameter/2),shrink);
 
+}
+
+module makePin(pin_w,pin_h,pin_d)
+{
+//    minkowski(){
+        smoother = 0.05;
+        smoother_inv = 1-smoother;
+        pd = smoother_inv*pin_d;
+        pw = smoother_inv*pin_w;
+        ph = smoother_inv*pin_h;
+        cube([pw,ph,pd],center=true);
+//        sphere([smoother,smoother.smoother]);
+//    }
 }
 
 module makeSingleClasp(innerD,outerD,length,shrink)
