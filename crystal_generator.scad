@@ -37,7 +37,7 @@ union()
         makePin(pin_w+10,pin_h*1.7,pin_d*1.7);
     }
 
-    translate([(bump*(diameter+outerD)/2),0,height/2])
+    translate([((bump*(diameter+outerD)+smooth)/2),0,height/2])
     rotate([90,0,0])
     makeDoubleClasp(innerD,outerD,(diameter/2),shrink);
 }
@@ -46,7 +46,8 @@ translate([-19,0,10])
 union(){
     translate([0,0,height/2])
     makeTopPyramid(diameter);
-    translate([bump*((diameter+outerD)/2),0,height/2])
+    
+    translate([(bump*((diameter+outerD)/2))+smooth,0,smooth+(height/2)])
     rotate([90,0,0])
     makeSingleClasp(innerD,outerD,diameter/2,shrink);
 
