@@ -5,63 +5,71 @@
 //openface(solid_1,outer_inset_ratio=0.3,inner_inset_ratio=0.2,depth=0.1,fn=[]);
 //
 
+// All dimensions are (sz/10) = mm
+// I.E. Everything is in tenths of mm
 // Overal dimensions 
-cageSz = 5; // the thickness of the bars 
-diameter = 50; // overall radius
-height = 200; // total lenght of the straight hexagnoal part
+cageSz = 20; // the thickness of the bars --->fix
+diameter = 95; // overall inner diameter 
+height = 340; // total lenght of the straight hexagnoal part
 count = 3; // number of bars down the body 
 
-// hinge params 
-innerD = 0.75; // hinge ID
-outerD = 1.5; // hinge OD
+// hinge params THIS IS RADIUS
+innerD = 13/2; // 16 gauge is 1.291mm // hinge ID
+outerD = 1.3*innerD; // hinge OD
+diff = 0.9*((outerD-innerD)/2);
+
 shrink = 0.03;
 bump = 1.002;
-smooth = 0; // Minkowski value 
+smooth = 1; // Minkowski value 
 
 // Bale params 
-bale_id = 2;
-bale_od = 4;
-bale_w = 2;
+bale_id = 13/2;
+bale_od = bale_id*1.4;
+bale_w = 5;
 
-pin_w = 1;
-pin_h = 0.5;
-pin_d = 3;
-$fn = 24;
+pin_w = 5;
+pin_h = 5;
+pin_d = 10;
+$fn = 72; //36
+
+
+color([1,0,0]) cylinder(h = height, r1 = 42, r2 = 42, center = true);
 
 union()
 {
     difference(){
         makeCageWithBars(count,diameter,height,cageSz);
-        sf = 1.05;
-        translate([(-diameter/2),0,(height/2)])
-        makePin(pin_w+10,pin_h*1.7,pin_d*1.7);
+        sf = 1.3;
+        translate([(-(diameter+cageSz)/2),0,(height/2)-(pin_h/2)])
+        makePin(cageSz*3,sf*pin_w,sf*pin_h);
     }
 
-    translate([((bump*(diameter+outerD)+smooth)/2),0,height/2])
+    translate([(outerD+((diameter+cageSz)/2))-diff,0,(height/2)])
     rotate([90,0,0])
     makeDoubleClasp(innerD,outerD,(diameter/2),shrink);
 }
-rotate([0,10,0])
-translate([-19,0,10])
+//rotate([0,10,0])
+//translate([-19,0,10])
+translate([0,0,100])
+
 union(){
     translate([0,0,height/2])
-    makeTopPyramid(diameter);
+    makeTopPyramid(diameter,cageSz);
     
-    translate([(bump*((diameter+outerD)/2))+smooth,0,smooth+(height/2)])
+    translate([(outerD+((diameter+cageSz)/2))-diff,0,smooth+(height/2)])
     rotate([90,0,0])
     makeSingleClasp(innerD,outerD,diameter/2,shrink);
 
-    translate([-1+-diameter/2,0,(height/2)-6.4])
-    scale([0.05,0.05,0.05])
+    translate([-3+-(cageSz+diameter)/2,0,(height/2)-cageSz-4.3])
     rotate([0,-90,-90]) 
     press_fit_clasp();
 
-    translate([0,0,(height/2)+diameter+1])
-    rotate([90,0,0])
+    translate([0,0,(height/2)+diameter+cageSz+(bale_od*0.6)])
+    rotate([90,0,90])
     bale(bale_id,bale_od,bale_w);
 
-    translate([(-diameter/2),0,(height/2)-0.8])
-    makePin(pin_w,pin_h,pin_d);
+    translate([(-(cageSz+diameter)/2)+(pin_d/2),0,(height/2)-(pin_h/2)])
+    makePin(pin_d,pin_w,pin_h);
     
     // Part of a wire press latch
 //    translate([-1*bump*((diameter+outerD)/2),0,height/2])
@@ -72,15 +80,15 @@ union(){
 
 module makePin(pin_w,pin_h,pin_d)
 {
-//    minkowski(){
+   minkowski(){
         smoother = 0.05;
         smoother_inv = 1-smoother;
         pd = smoother_inv*pin_d;
         pw = smoother_inv*pin_w;
         ph = smoother_inv*pin_h;
         cube([pw,ph,pd],center=true);
-//        sphere([smoother,smoother.smoother]);
-//    }
+        sphere([smoother,smoother.smoother]);
+    }
 }
 
 module makeSingleClasp(innerD,outerD,length,shrink)
@@ -113,10 +121,11 @@ module makeDoubleClasp(innerD,outerD,length,shrink)
     }
 }
 
-module makeTopPyramid(diameter)
+module makeTopPyramid(diameter,cageSz)
 {
     minkowski(){
-        scale([diameter/2,diameter/2,diameter/2])
+         s = (diameter+cageSz)/2;
+        scale([s,s,s])
         difference(){
             import("hexdipy.stl", convexity=3);
             translate([0,0,-1])
@@ -126,10 +135,11 @@ module makeTopPyramid(diameter)
     }
 }
 
-module makeBottomPyramid(diameter)
+module makeBottomPyramid(diameter,cageSz)
 {
     minkowski(){
-        scale([diameter/2,diameter/2,diameter/2])
+         s = (diameter+cageSz)/2;
+        scale([s,s,s])
         difference(){
             import("hexdipy.stl", convexity=3);
             translate([0,0,+1])
@@ -172,7 +182,7 @@ module makeCageWithBars(count,width,height,cageSz)
             sphere(smooth);
     }
     translate([0,0,(-height/2)])
-    makeBottomPyramid(diameter);
+    makeBottomPyramid(diameter,cageSz);
     }
 }
 
@@ -181,7 +191,7 @@ module makeBar(width,cageSz)
     union(){
         for (i=[0:60:360]){
             rotate([0,0,i])
-            translate([width/2-cageSz/4,,0])
+            translate([(width/2)+cageSz/4,0,0])
             cube(size = [cageSz/2,width/2,(cageSz/2)], center = true);
         }
     }
@@ -193,7 +203,7 @@ module makeCage(width,height,cageSz)
         buildHexRod(width,height,cageSz);
         for (i=[0:60:360]){
             rotate([0,0,i])
-            translate([width/2,0,0])
+            translate([(width/2),0,0])
             cube(size = [width/2,(width-cageSz)/2,height-(2*cageSz)],      center = true);
         }
     }
@@ -203,29 +213,30 @@ module buildHexRod(width,height,cageSz)
 {
     difference()
     {
-        hexagon(cle=width,h=height);
-        hexagon(cle=width-cageSz,h=height+2);
+        hexagon(cle=width+cageSz,h=height);
+        hexagon(cle=width,h=height+2);
     }
 }
 
 module press_fit_clasp()
 {
-    c_l = 200; // total length
-    c_d = 40; // total width
-    c_m = 110; // mount depth
-    c_w = 10; // width of actual bar
-    c_p = 20; // point length
-    c_s = 20; // the point slope controller 
-    c_b = 20; // bumpy ledge that holds
+    c_m = 1; // mount depth     
+    c_p = 4; // point length
+
+    c_l = 20.5+c_m+c_p; // total length
+    c_d = 4; // total width
+    c_w = 2; // width of actual bar
+    c_s = 1; // the point slope controller 
+    c_b = 3; // bumpy ledge that holds
     smooth = 0;
     minkowski(){
-        linear_extrude(height = 30, center = true, convexity = 10, twist = 0)
+        linear_extrude(height = 10, center = true, convexity = 10, twist = 0)
         minkowski()
         {
             polygon(points=[[0,0],[c_l,0],[c_l,c_d],[(c_l-c_m),c_d],[(c_l-c_m),c_w],[c_p,c_w],[c_p,c_w+c_b],[0,c_s]]);
-            circle(3);
+            circle(0.1);
         }
-    sphere(3);
+    sphere(0.1);
     }
 }
 
