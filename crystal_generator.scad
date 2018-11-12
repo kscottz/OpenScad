@@ -1,4 +1,4 @@
-    // http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalPrism
+// http://kitwallace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalPrism
 //  http://kitwllace.co.uk/3d/solid-index.xq?mode=solid&id=HexagonalDipyramid
 // hexdipy needs the face thickness to be set to ( cage size / diameter ) * 2 to render correctly eg (5/50)*2 and then scaled to unit length. 
 
@@ -12,10 +12,10 @@ cageSz = 20; // the thickness of the bars --->fix
 diameter = 95; // overall inner diameter 
 height = 340; // total lenght of the straight hexagnoal part
 count = 3; // number of bars down the body 
-high_def = 16;
-low_def = 16;
+high_def = 48;
+low_def = 24;
 // hinge params THIS IS RADIUS
-innerD = 5; // 16 gauge is 1.291mm // hinge ID
+innerD = 7; // 16 gauge is 1.291mm // hinge ID
 outerD = innerD+8; // hinge OD
 diff = 0.9*((outerD-innerD)/2);
 
@@ -31,7 +31,7 @@ bale_w = 8;
 pin_w = 8;
 pin_h = 8;
 pin_d = 10;
-$fn = 12; //36
+$fn = 24; //36
 
 
 
@@ -39,47 +39,75 @@ $fn = 12; //36
 //color([1,0,0]) 
 //cylinder(h = height, r1 = 42, r2 = 42, center = true);
 
+translate([-((diameter/2)+18),0,(height/4)])
+sphere(d=20);
+
 union()
 {
+    // difference(){
+    //    makeCageWithBars(count,diameter,height,cageSz);
+    //    sf = 1.3;
+    //    translate([(-(diameter+cageSz)/2),0,(height/2)-(pin_h/2)])
+    //    makePin(cageSz*3,sf*pin_w,sf*pin_h);
+    // }
+
+    //rotate([90,45,0])
     difference(){
         makeCageWithBars(count,diameter,height,cageSz);
-        sf = 1.3;
-        translate([(-(diameter+cageSz)/2),0,(height/2)-(pin_h/2)])
-        makePin(cageSz*3,sf*pin_w,sf*pin_h);
+        translate([(outerD+((diameter+cageSz)/2))-diff,0,(height/2)]) 
+        rotate([90,45,0])
+        cylinder(diameter/2,outerD,outerD,center=true);
     }
-
+    
+    
     translate([(outerD+((diameter+cageSz)/2))-diff,0,(height/2)])
     rotate([90,0,0])
-    makeDoubleClasp(innerD,outerD,(diameter/2),shrink);
+    makeDoubleClasp(innerD,outerD,1.4*(diameter/2),shrink);
     
     // reinforcemnet for DRC
     translate([0,0,-(height/2+diameter-15)])
     cylinder(h = 10, r1=diameter*0.1, r2=diameter*0.1, 
              center = true, $fn=low_def);
 
+
 }
 //rotate([0,10,0])
 //translate([-19,0,10])
-translate([0,0,0])
+translate([0,0,30])
 
 union(){
-    translate([0,0,height/2])
-    makeTopPyramid(diameter,cageSz);
+    union(){
+        difference(){
+            translate([0,0,height/2])        
+            makeTopPyramid(diameter,cageSz);
+            translate([(outerD+((diameter+cageSz)/2))-diff,0,(smooth+(height/2))-3])
+            rotate([90,45,0])
+            cylinder(diameter,0.99*outerD,0.99*outerD,center=true);
+        }
     
-    translate([(outerD+((diameter+cageSz)/2))-diff,0,smooth+(height/2)])
-    rotate([90,0,0])
-    makeSingleClasp(innerD,outerD,diameter/2,shrink);
+        // From prints the top clasp needs to be moved down a bit
+        translate([(outerD+((diameter+cageSz)/2))-diff,0,(smooth+(height/2))-3])
+        rotate([90,0,0])
+        makeSingleClasp(innerD,outerD,diameter/2,shrink);
+        wireSz = 10;
+        translate([-((diameter/2)+(1.5*wireSz)),(diameter/2)*0.45,(height/2)+(  wireSz*0.85)])
+        rotate([0,-90,0])
+        wireClaspMount(10,diameter/8);
 
-    translate([-7+-(cageSz+diameter)/2,0,(height/2)-cageSz-4.3])
-    rotate([0,-90,-90]) 
-    press_fit_clasp();
+        translate([-((diameter/2)+(1.5*wireSz)),-(diameter/2)*0.45,(height/2)+( wireSz*0.85)])
+        rotate([0,90,180])
+        wireClaspMount(10,diameter/8);
+    }
+    // translate([-7+-(cageSz+diameter)/2,0,(height/2)-cageSz-4.3])
+    // rotate([0,-90,-90]) 
+    // press_fit_clasp();
 
-    translate([0,0,(height/2)+diameter+cageSz+(bale_od*0.8)])
-    rotate([90,0,90])
-    bale(bale_id,bale_od,bale_w);
+    // translate([0,0,(height/2)+diameter+cageSz+(bale_od*0.8)])
+    // rotate([90,0,90])
+    // bale(bale_id,bale_od,bale_w);
 
-    translate([(-(cageSz+diameter)/2)+(pin_d/2),0,(height/2)-(pin_h/2)])
-    makePin(pin_d,pin_w,pin_h);
+    // translate([(-(cageSz+diameter)/2)+(pin_d/2),0,(height/2)-(pin_h/2)])
+    // makePin(pin_d,pin_w,pin_h);
 
     // reinforcemnet for DRC    
     translate([0,0,height/2+diameter-15])
@@ -94,6 +122,21 @@ union(){
 
 }
 
+module wireClaspMount(wireD,mountL)
+{
+    wallThickness = 7; // size of the bit caps the wire tube
+    newD = wallThickness+wireD;
+    rotate([0,-90,90])
+    difference(){
+            union(){
+                cylinder(h=mountL,r1=newD/2, r2=newD/2, center=true);
+                translate([-newD/2,0,0])
+                cube([newD,newD,mountL], center=true);
+            }
+            translate([0,0,wallThickness])
+            cylinder(h=mountL,r1=wireD/2, r2=wireD/2, center=true);
+    }
+}
 module makePin(pin_w,pin_h,pin_d)
 {
    minkowski(){
