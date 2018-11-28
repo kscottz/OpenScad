@@ -9,7 +9,7 @@
 // I.E. Everything is in tenths of mm
 // Overal dimensions 
 cageSz = 20; // the thickness of the bars --->fix
-diameter = 95; // overall inner diameter 
+diameter = 87; // overall inner diameter 
 height = 340; // total lenght of the straight hexagnoal part
 count = 3; // number of bars down the body 
 high_def = 48;
@@ -31,13 +31,13 @@ bale_w = 8;
 pin_w = 8;
 pin_h = 8;
 pin_d = 10;
-$fn = 24; //36
+$fn = 36; //36
 
 
 
 //$fn=low_def;
 //color([1,0,0]) 
-//cylinder(h = height, r1 = 42, r2 = 42, center = true);
+cylinder(h = height, r1 = 42, r2 = 42, center = true);
 
 translate([-((diameter/2)+18),0,(height/4)])
 sphere(d=20);
@@ -69,11 +69,13 @@ union()
     cylinder(h = 10, r1=diameter*0.1, r2=diameter*0.1, 
              center = true, $fn=low_def);
 
+//    translate([-1*((diameter/2)+cageSz),0,height/2])
+//    sphere(10,center=true);
 
 }
 //rotate([0,10,0])
 //translate([-19,0,10])
-translate([0,0,30])
+translate([0,0,0])
 
 union(){
     union(){
@@ -92,11 +94,12 @@ union(){
         wireSz = 10;
         translate([-((diameter/2)+(1.5*wireSz)),(diameter/2)*0.45,(height/2)+(  wireSz*0.85)])
         rotate([0,-90,0])
-        wireClaspMount(10,diameter/8);
+        wireClaspMount(10,diameter/5);
 
         translate([-((diameter/2)+(1.5*wireSz)),-(diameter/2)*0.45,(height/2)+( wireSz*0.85)])
         rotate([0,90,180])
-        wireClaspMount(10,diameter/8);
+        wireClaspMount(10,diameter/5);
+
     }
     // translate([-7+-(cageSz+diameter)/2,0,(height/2)-cageSz-4.3])
     // rotate([0,-90,-90]) 
