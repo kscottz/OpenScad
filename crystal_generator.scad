@@ -9,8 +9,8 @@
 // I.E. Everything is in tenths of mm
 // Overal dimensions 
 cageSz = 20; // the thickness of the bars --->fix
-diameter = 87; // overall inner diameter 
-height = 340; // total lenght of the straight hexagnoal part
+diameter = 90; //87; // overall inner diameter 
+height = 350; // total lenght of the straight hexagnoal part
 count = 3; // number of bars down the body 
 high_def = 48;
 low_def = 24;
@@ -21,7 +21,7 @@ diff = 0.9*((outerD-innerD)/2);
 
 shrink = 0.03;
 bump = 1.002;
-smooth =  0; // Minkowski value 
+smooth =  0.1; // Minkowski value 
 
 // Bale params 
 bale_id = 5;
@@ -37,7 +37,7 @@ $fn = 36; //36
 
 //$fn=low_def;
 //color([1,0,0]) 
-cylinder(h = height, r1 = 42, r2 = 42, center = true);
+//cylinder(h = height, r1 = 42, r2 = 42, center = true);
 
 translate([-((diameter/2)+18),0,(height/4)])
 sphere(d=20);
@@ -74,8 +74,8 @@ union()
 
 }
 //rotate([0,10,0])
-//translate([-19,0,10])
-translate([0,0,0])
+translate([0,0,40])
+//translate([0,0,0])
 
 union(){
     union(){
