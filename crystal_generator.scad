@@ -21,7 +21,7 @@ diff = 0.9*((outerD-innerD)/2);
 
 shrink = 0.03;
 bump = 1.002;
-smooth =  0.1; // Minkowski value 
+smooth =  0.0; // Minkowski value 
 
 // Bale params 
 bale_id = 5;
@@ -33,44 +33,32 @@ pin_h = 8;
 pin_d = 10;
 $fn = 36; //36
 
-
-
-//$fn=low_def;
-//color([1,0,0]) 
-//cylinder(h = height, r1 = 42, r2 = 42, center = true);
-
-translate([-((diameter/2)+18),0,(height/4)])
-sphere(d=20);
-
 union()
 {
-    // difference(){
-    //    makeCageWithBars(count,diameter,height,cageSz);
-    //    sf = 1.3;
-    //    translate([(-(diameter+cageSz)/2),0,(height/2)-(pin_h/2)])
-    //    makePin(cageSz*3,sf*pin_w,sf*pin_h);
-    // }
-
-    //rotate([90,45,0])
-    difference(){
-        makeCageWithBars(count,diameter,height,cageSz);
-        translate([(outerD+((diameter+cageSz)/2))-diff,0,(height/2)]) 
-        rotate([90,45,0])
-        cylinder(diameter/2,outerD,outerD,center=true);
+    difference()
+    {
+        union()
+        {
+            // Main cage
+            makeCageWithBars(count,diameter,height,cageSz);
+            // Make the back clasp
+            translate([(outerD+((diameter+cageSz)/2))-diff,0,(height/2)])
+            rotate([90,0,0])
+            makeDoubleClasp(innerD,outerD,1.4*(diameter/2),shrink);
+    
+            // reinforcemnet for DRC
+            translate([0,0,-(height/2+diameter-15)])
+            cylinder(h = 10, r1=diameter*0.1, r2=diameter*0.1, 
+                    center = true, $fn=low_def);
+        }
+        // make the insert hole for the pin
+        sf = 1.3;
+        translate([(-(diameter+cageSz)/2),0,(height/2)-(pin_h/2)])
+        makePin(cageSz*3,sf*pin_w,sf*pin_h);
     }
-    
-    
-    translate([(outerD+((diameter+cageSz)/2))-diff,0,(height/2)])
-    rotate([90,0,0])
-    makeDoubleClasp(innerD,outerD,1.4*(diameter/2),shrink);
-    
-    // reinforcemnet for DRC
-    translate([0,0,-(height/2+diameter-15)])
-    cylinder(h = 10, r1=diameter*0.1, r2=diameter*0.1, 
-             center = true, $fn=low_def);
-
-//    translate([-1*((diameter/2)+cageSz),0,height/2])
-//    sphere(10,center=true);
+    // do the hinge clasp
+    translate([-1*((diameter/2)+cageSz),0,(height/4)-(cageSz/8)])
+    sphere(10,center=true);
 
 }
 //rotate([0,10,0])
@@ -109,8 +97,8 @@ union(){
     // rotate([90,0,90])
     // bale(bale_id,bale_od,bale_w);
 
-    // translate([(-(cageSz+diameter)/2)+(pin_d/2),0,(height/2)-(pin_h/2)])
-    // makePin(pin_d,pin_w,pin_h);
+    translate([(-(cageSz+diameter)/2)+(pin_d/2),0,(height/2)-(pin_h/2)])
+    makePin(pin_d,pin_w,pin_h);
 
     // reinforcemnet for DRC    
     translate([0,0,height/2+diameter-15])
