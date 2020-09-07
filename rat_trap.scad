@@ -1,3 +1,4 @@
+$fn=36;
 board_w = 100; //y
 board_h = 100; //x
 board_d = 3; //z 
@@ -5,11 +6,6 @@ screw_d = 3.5;
 screw_offset = 2+screw_d;
 
 
-bowl_r = 15;
-bowl_h = 12;
-bowl_thickness = 1;
-
-$fn=72;
 
 
 module base_board( board_w,board_h,board_d,screw_offset){
@@ -39,6 +35,19 @@ module base_board( board_w,board_h,board_d,screw_offset){
     translate(v=[screw_offset,board_h-screw_offset,board_d-head_height]) 
         cylinder(r=screw_head/2,h=2*board_d);
         
+
+    off_hole = 30;
+    translate(v=[screw_offset+off_hole,screw_offset+off_hole,-1]) 
+        cylinder(r=screw_d/2,h=2*board_d);
+    translate(v=[screw_offset+off_hole,screw_offset+off_hole,board_d-head_height]) 
+        cylinder(r=screw_head/2,h=2*board_d);
+
+    translate(v=[board_w-screw_offset-off_hole,screw_offset+off_hole,-1]) 
+        cylinder(r=screw_d/2,h=2*board_d);
+    translate(v=[board_w-screw_offset-off_hole,screw_offset+off_hole,board_d-head_height]) 
+        cylinder(r=screw_head/2,h=2*board_d);
+
+
     }
  
     ridge = 3;
@@ -50,7 +59,9 @@ module base_board( board_w,board_h,board_d,screw_offset){
     }
 };
 
-
+bowl_r = 15;
+bowl_h = 12;
+bowl_thickness = 1;
 module bowl(bowl_r,bowl_h,bowl_thickness){
     difference(){
         difference(){
@@ -70,8 +81,8 @@ module bowl(bowl_r,bowl_h,bowl_thickness){
 slide_w = 100;
 slide_h = 20;
 slide_d = 10;
-slide_t = 2;
-hole_r = 7;
+slide_t = 5;
+hole_r = 4;
 // A box with holes in it
 
 module slider(
@@ -82,6 +93,7 @@ module slider(
     hole_r ){
     
     mk = 1;
+    count = (slide_w - (4*hole_r)) / (3*hole_r);
     difference(){
         difference(){
             cube(size = [slide_w,slide_h,slide_d]);
@@ -91,9 +103,10 @@ module slider(
                 sphere(r=mk);
             }
         }   
-        for(k=[0:5]){
-            translate(v=[(2*hole_r)+2.2*k*hole_r,slide_h/2,0])
-            cylinder(r=hole_r,h=slide_d*2);    
+        for(k=[0:count]){
+            translate(v=[(2*hole_r)+(3*k*hole_r),slide_h/2,0])            
+            //translate(v=[(2*hole_r)+2.2*k*hole_r,slide_h/2,0])
+            cylinder(r=rands(hole_r-2,hole_r+hole_r-2,1)[0],h=slide_d*2);    
         }
     }
 }
@@ -101,7 +114,7 @@ module slider(
 point_r1 = 2;
 point_r2 = 1;
 point_h = 12;
-point_r = 1.2;
+point_r = 1.4;
 
 module point(
     point_r1,
@@ -122,10 +135,13 @@ module tube(
     tube_od,
     tube_id,
     tube_h){
-    difference(){
-        cylinder(r=tube_od,h=tube_h);
-        cylinder(r=tube_id,h=tube_h);
-    };
+    minkowski(){
+        difference(){
+            cylinder(r=tube_od,h=tube_h);
+            cylinder(r=tube_id,h=tube_h);
+        };
+        sphere(0.3);
+    }
 }
 
 
@@ -135,9 +151,9 @@ translate([0,40,board_d])
 base_board( board_w,board_h,board_d,screw_offset);
 
 translate(v=[17,20,board_d])
-    bowl(bowl_r,bowl_h,bowl_thickness);
+    bowl(bowl_r,bowl_h-1,bowl_thickness);
 translate(v=[50,20,board_d])
-    bowl(bowl_r,bowl_h,bowl_thickness);
+    bowl(bowl_r,bowl_h+1,bowl_thickness);
 translate(v=[83,20,board_d])
     bowl(bowl_r,bowl_h,bowl_thickness);
 
@@ -146,11 +162,15 @@ y = 67;
 space = 5;
 offset = tube_od+point_r1+space+space;
 xoff = 2;
+tube_min = tube_h-5;
+tube_max = tube_h+7;
+
 for(x = [space+xoff : offset : board_w-offset]){
     translate(v=[x+(point_r1/2),y,board_d])
-    point(point_r1,point_r2,point_h,point_r);
+        point(point_r1,point_r2,point_h,point_r);
     translate(v=[x+point_r1+space+(tube_od/2),y,board_d])
-    tube(tube_od,tube_id,tube_h);
+        tube(tube_od,tube_id,rands(tube_min,tube_max,1)[0]);
+    
 }
 x = board_w-(offset/2);
 translate(v=[x+(point_r1/2),y,board_d])
@@ -161,9 +181,9 @@ point(point_r1,point_r2,point_h,point_r);
 y2 = 80;
 for(x = [space+xoff : offset : board_w-offset]){
     translate(v=[x+tube_od/2,y2,board_d])
-    tube(tube_od,tube_id,tube_h);
+        tube(tube_od,tube_id,rands(tube_min,tube_max,1)[0]);
     translate(v=[x+space+tube_od+(point_r1/2),y2,board_d])
-    point(point_r1,point_r2,point_h,point_r);
+        point(point_r1,point_r2,point_h,point_r);
 }
 x = board_w-(offset/2);
 translate(v=[x+tube_od/2,y2,board_d])
@@ -173,8 +193,8 @@ tube(tube_od,tube_id,tube_h);
 y3 = 93;
 for(x = [screw_offset+screw_d+2: offset : board_w-offset-screw_offset+10]){
     translate(v=[x+tube_od/2,y3,board_d])
-    tube(tube_od,tube_id,tube_h);
+        tube(tube_od,tube_id,rands(tube_min,tube_max,1)[0]);
     translate(v=[x+space+tube_od+(point_r1/2),y3,board_d])
-    point(point_r1,point_r2,point_h,point_r);
+        point(point_r1,point_r2,point_h,point_r);
 }
 
