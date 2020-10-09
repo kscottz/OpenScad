@@ -2,6 +2,7 @@ module dome(r, // radius
             thickness)
 {
     difference(){
+        scale([1,1,0.3])
         difference(){
             sphere(r = r);
             sphere(r = r - thickness);
@@ -15,6 +16,7 @@ module bowl(r, // radius
             thickness)
 {
     difference(){
+        scale([1,1,0.3])
         difference(){
             sphere(r = r);
             sphere(r = r - thickness);
@@ -107,11 +109,11 @@ body(r,height,thickness,hole_r,3);
 
 hanger_thickness = 3;
 hanger_width = 15;
-hanger_height = 30;
+hanger_height = 25;
 hanger_overhang = 5;
 hanger_x_space = (2/3)*r;
-hanger_y_space = (2/3)*r;
-hang_z = 0.9*(height/2);
+hanger_y_space = 61;//*r;
+hang_z = 0.45*(height/2);
 
 module make_hook(
     hanger_thickness,
